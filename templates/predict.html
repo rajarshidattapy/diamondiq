@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Diamond Price Prediction</h1>
+<form method="POST">
+    <div class="form-group">
+        <label for="carat">Carat Weight:</label>
+        <input type="number" class="form-control" id="carat" name="carat" min="0.1" max="10.0" step="0.1" value="1.0" required>
+    </div>
+    <div class="form-group">
+        <label for="cut">Cut Rating:</label>
+        <select class="form-control" id="cut" name="cut" required>
+            <option>Fair</option>
+            <option>Good</option>
+            <option>Very Good</option>
+            <option>Premium</option>
+            <option>Ideal</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="color">Color Rating:</label>
+        <select class="form-control" id="color" name="color" required>
+            <option>D</option>
+            <option>E</option>
+            <option>F</option>
+            <option>G</option>
+            <option>H</option>
+            <option>I</option>
+            <option>J</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="clarity">Clarity Rating:</label>
+        <select class="form-control" id="clarity" name="clarity" required>
+            <option>I1</option>
+            <option>SI2</option>
+            <option>SI1</option>
+            <option>VS2</option>
+            <option>VS1</option>
+            <option>VVS2</option>
+            <option>VVS1</option>
+            <option>IF</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="depth">Depth Percentage:</label>
+        <input type="number" class="form-control" id="depth" name="depth" min="0.1" max="100.0" step="0.1" value="60.0" required>
+    </div>
+    <div class="form-group">
+        <label for="table">Table Percentage:</label>
+        <input type="number" class="form-control" id="table" name="table" min="0.1" max="100.0" step="0.1" value="55.0" required>
+    </div>
+    <div class="form-group">
+        <label for="x">Length (X) in mm:</label>
+        <input type="number" class="form-control" id="x" name="x" min="0.1" max="100.0" step="0.1" value="5.0" required>
+    </div>
+    <div class="form-group">
+        <label for="y">Width (Y) in mm:</label>
+        <input type="number" class="form-control" id="y" name="y" min="0.1" max="100.0" step="0.1" value="5.0" required>
+    </div>
+    <div class="form-group">
+        <label for="z">Depth (Z) in mm:</label>
+        <input type="number" class="form-control" id="z" name="z" min="0.1" max="100.0" step="0.1" value="3.0" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Predict Price</button>
+</form>
+
+{% if prediction %}
+<div class="mt-4 alert alert-success">
+    <h4>Predicted Price: {{ prediction }}</h4>
+</div>
+{% endif %}
+
+{% if error %}
+<div class="mt-4 alert alert-danger">
+    <h4>Error: {{ error }}</h4>
+</div>
+{% endif %}
+{% endblock %}

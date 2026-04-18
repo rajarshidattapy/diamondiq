@@ -1,0 +1,8 @@
+name: project-env
+dependencies:
+  - python=3.8
+  - pip:
+    - joblib
+    - numpy
+    - azureml-core
+    - xgboost
