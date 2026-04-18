@@ -1,28 +1,46 @@
-# Diamond Price Prediction
+# DiamondIQ — Explainable AI-Powered Diamond Valuation System
 
-This project is a web application that predicts the price of a diamond based on its characteristics using a machine learning model. The application is built using Python, with Streamlit as the web framework, and Scikit-learn for the machine learning components.
+A production-grade diamond price prediction and trend simulation platform built with Python, Streamlit, and XGBoost.
 
-# You can use the application directly through the following link: [Diamond Price Predictor](https://ashwin492-diamondpricepredictor-app-nfkevz.streamlit.app/).
+## Live App
+
+[DiamondIQ on Streamlit Cloud](https://ashwin492-diamondpricepredictor-app-nfkevz.streamlit.app/)
 
 ## Table of Contents
-- [Project Overview](#project-overview)
+- [Overview](#overview)
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [File Structure](#file-structure)
 - [Model Information](#model-information)
-- [Contributing](#contributing)
-- [License](#license)
+- [Preprocessing Pipeline](#preprocessing-pipeline)
 
-## Project Overview
-The goal of this project is to build a regression model to predict the price of diamonds. The model uses various features such as carat weight, cut, color, clarity, depth, table, and dimensions (x, y, z) of the diamond. The app allows users to input these features and predicts the price of the diamond in real-time.
+## Overview
+
+DiamondIQ goes beyond a basic price prediction tool. It provides an interactive valuation intelligence platform where users can predict diamond prices **and** simulate how price changes as carat weight varies — all powered by a tuned XGBoost model with a 98.1% R² score.
 
 ## Features
-- **Real-time Price Prediction:** Users can input diamond characteristics and get a price prediction instantly.
-- **Preprocessing Pipeline:** The app uses a preprocessing pipeline that handles missing values, encoding categorical features, and scaling numerical features.
-- **Model Training:** The application trains several machine learning models and selects the best-performing model based on R² score.
-- **User-Friendly Interface:** The app is built using Streamlit, making it easy to use and interact with.
-- **Data Visualization:** The app provides visualizations to help users understand the relationships between diamond features and prices, including scatter plots, box plots, and correlation heatmaps.
+
+### Module A — Diamond Price Prediction Engine
+- Structured input form (carat, cut, color, clarity, depth, table, x, y, z)
+- Full preprocessing pipeline applied on every prediction (imputation → ordinal encoding → scaling)
+- Premium price output card displayed instantly after submission
+
+### Module B — Price Trend Simulation
+- Interactive carat range slider (0.2 ct → 5.0 ct)
+- Runs model inference across the full carat range while keeping all other features constant
+- Live line chart: Carat (X-axis) vs Predicted Price (Y-axis)
+- Metrics row: price at range min, your diamond, price at range max with % delta
+- Auto-insight text when price acceleration is significant
+
+### Data Visualization Page
+Six interactive Plotly charts exploring the diamond dataset:
+1. Price vs Carat by Cut Quality
+2. Price Distribution by Cut
+3. Correlation Heatmap of Numeric Features
+4. Price by Color and Clarity
+5. Carat Weight Distribution
+6. Price Trends by Cut with OLS Trendlines
 
 ## Installation
 
@@ -31,92 +49,95 @@ The goal of this project is to build a regression model to predict the price of 
 - pip
 
 ### Steps
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/your-username/diamond-price-prediction.git
-2. Navigate to the project directory
    cd diamond-price-prediction
-3. Create and activate a virtual environment
-   python -m venv venv
-   source venv/bin/activate   # On Windows, use `venv\Scripts\activate`
-4. Install the required packages:
+   ```
+
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv myenv
+   # Windows
+   myenv\Scripts\activate
+   # macOS / Linux
+   source myenv/bin/activate
+   ```
+
+3. Install dependencies:
+   ```bash
    pip install -r requirements.txt
-5. Run the Streamlit app
-   Run the Streamlit app
+   ```
+
+4. (Optional) Retrain the model:
+   ```bash
+   python training_pipeline.py
+   ```
+
+5. Launch the app:
+   ```bash
+   streamlit run app.py
+   ```
 
 ## File Structure
-    ├── app.py                 # The main Streamlit app file
-    ├── src/
-    │   ├── components/
-    │   │   ├── data_ingestion.py
-    │   │   ├── data_transformation.py
-    │   │   ├── model_trainer.py
-    │   ├── logger.py
-    │   ├── exception.py
-    │   ├── utils.py
-    ├── artifacts/             # Directory for storing artifacts (e.g., models, preprocessors)
-    ├── notebooks/             # Jupyter notebooks for experimentation
-    ├── training_pipeline.py   # Script for training the machine learning model
-    ├── prediction_pipeline.py # Script for making predictions with the trained model
-    ├── requirements.txt       # List of required Python packages
-    └── README.md              # This file
+
+```
+diamondPricePredictor/
+├── app.py                        # Streamlit app (prediction + simulation + visualizations)
+├── training_pipeline.py          # End-to-end ML training pipeline
+├── score.py                      # Azure ML scoring endpoint
+├── main.py                       # Legacy Flask interface
+├── requirements.txt
+├── setup.py
+│
+├── src/
+│   ├── components/
+│   │   ├── data_ingestion.py     # Loads data, creates train/test split
+│   │   ├── data_tranformation.py # Preprocessing pipeline (impute → encode → scale)
+│   │   └── model_trainer.py      # Optuna hyperparameter tuning across 6 models
+│   ├── logger.py
+│   ├── exception.py
+│   └── utils.py
+│
+├── artifacts/
+│   ├── model.pkl                 # Trained XGBoost model
+│   ├── preprocessor.pkl          # Fitted ColumnTransformer pipeline
+│   ├── raw.csv
+│   ├── train.csv
+│   └── test.csv
+│
+├── notebook/
+│   ├── data/gemstone.csv         # Source dataset
+│   ├── EDA.ipynb
+│   └── model_training.ipynb
+│
+└── templates/                    # Flask HTML templates (legacy)
+```
 
 ## Model Information
-The model is trained on a dataset of diamonds with various features. It uses the following machine learning models:
 
-1. Linear Regression
-2. Lasso Regression
-3. Ridge Regression
-4. ElasticNet Regression
-5. Decision Tree Regressor  
-6. XGBRegressor
+Six models were evaluated using Optuna hyperparameter tuning (50 trials each, 5-fold CV):
 
-### Model Training Output
-During the model training process, the following output was observed:
+| Model | R² Score |
+|---|---|
+| Linear Regression | 0.9078 |
+| Lasso | 0.9078 |
+| Ridge | 0.9078 |
+| ElasticNet | 0.9078 |
+| Decision Tree | 0.9715 |
+| **XGBoost** | **0.9812** |
 
-- **Linear Regression**
-  - `[2024-09-25 00:35:04,909] 71 root - INFO - Starting Optuna study for LinearRegression`
-  - `[2024-09-25 00:35:06,800] 76 root - INFO - Best trial for LinearRegression: {} with R2 score: 0.9077971467453405`
-
-- **Lasso**
-  - `[2024-09-25 00:35:06,801] 71 root - INFO - Starting Optuna study for Lasso`
-  - `[2024-09-25 00:36:48,367] 76 root - INFO - Best trial for Lasso: {'alpha': 0.12466789931248218} with R2 score: 0.9077908859489175`
-
-- **Ridge**
-  - `[2024-09-25 00:36:48,367] 71 root - INFO - Starting Optuna study for Ridge`
-  - `[2024-09-25 00:36:49,670] 76 root - INFO - Best trial for Ridge: {'alpha': 0.9877354284937806} with R2 score: 0.9077992549637381`
-
-- **ElasticNet**
-  - `[2024-09-25 00:36:49,670] 71 root - INFO - Starting Optuna study for ElasticNet`
-  - `[2024-09-25 00:38:26,954] 76 root - INFO - Best trial for ElasticNet: {'alpha': 0.00038093059857817273, 'l1_ratio': 0.9142385116456486} with R2 score: 0.9077899769121072`
-
-- **Decision Tree**
-  - `[2024-09-25 00:38:26,954] 71 root - INFO - Starting Optuna study for DecisionTree`
-  - `[2024-09-25 00:38:37,565] 76 root - INFO - Best trial for DecisionTree: {'max_depth': 10, 'min_samples_split': 18} with R2 score: 0.971463449713504`
-
-- **XGBoost**
-  - `[2024-09-25 00:38:37,565] 71 root - INFO - Starting Optuna study for XGBoost`
-  - `[2024-09-25 01:20:05,807] 76 root - INFO - Best trial for XGBoost: {'max_depth': 5, 'learning_rate': 0.041326860912172386, 'n_estimators': 283} with R2 score: 0.9812234655086796`
-
-- **Model Report**
-  - `[2024-09-25 01:20:05,809] 79 root - INFO - Model report: {'LinearRegression': 0.9077971467453405, 'Lasso': 0.9077908859489175, 'Ridge': 0.9077992549637381, 'ElasticNet': 0.9077899769121072, 'DecisionTree': 0.971463449713504, 'XGBoost': 0.9812234655086796}`
-  - `[2024-09-25 01:20:05,809] 99 root - INFO - Best Model Found, Model name: XGBoost, R2 score: 0.9812234655086796`
-
-
-
+**Best model:** XGBoost — `max_depth=5`, `learning_rate=0.0413`, `n_estimators=283`
 
 ## Preprocessing Pipeline
-The preprocessing pipeline includes:
 
-1. Numerical Features: Imputation of missing values using the median and scaling using StandardScaler.
-2. Categorical Features: Imputation of missing values using the most frequent strategy, ordinal encoding, and scaling.
+| Feature Type | Steps |
+|---|---|
+| Numerical (carat, depth, table, x, y, z) | Median imputation → StandardScaler |
+| Categorical (cut, color, clarity) | Most-frequent imputation → OrdinalEncoder → StandardScaler |
 
-## Data Visualization
-The application includes several visualizations to explore the diamond dataset, including:
-
-1. Price vs Carat: A scatter plot showing the relationship between a diamond's carat weight and its price.
-2. Price Distribution by Cut: A box plot displaying the distribution of diamond prices for each cut quality.
-3. Correlation Heatmap: A heatmap showing correlations between numeric features.
-4. Price by Color and Clarity: A box plot showing how diamond prices vary across different color grades and clarity levels.
-5. Carat Distribution: A histogram displaying the distribution of diamond carat weights.
-6. Price Trends by Cut and Carat: A scatter plot with trend lines showing how the relationship between carat weight and price varies across different cut qualities.
+Ordinal category ordering:
+- **Cut:** Fair → Good → Very Good → Premium → Ideal
+- **Color:** D → E → F → G → H → I → J
+- **Clarity:** I1 → SI2 → SI1 → VS2 → VS1 → VVS2 → VVS1 → IF
