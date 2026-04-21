@@ -8,5 +8,4 @@ plotly
 statsmodels
 scikit-learn
 Optuna
-
--e .
+streamlit

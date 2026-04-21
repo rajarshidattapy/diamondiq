@@ -58,6 +58,7 @@ class ModelTrainer:
 
             models = ['LinearRegression', 'Lasso', 'Ridge', 'ElasticNet', 'DecisionTree', 'XGBoost']
             best_models = {}
+            best_studies = {}
 
             for model_name in models:
                 logging.info(f'Starting Optuna study for {model_name}')
@@ -66,6 +67,7 @@ class ModelTrainer:
 
                 logging.info(f"Best trial for {model_name}: {study.best_trial.params} with R2 score: {study.best_value}")
                 best_models[model_name] = study.best_value
+                best_studies[model_name] = study
 
             logging.info(f"Model report: {best_models}")
 
@@ -73,7 +75,7 @@ class ModelTrainer:
             best_model_score = best_models[best_model_name]
 
             # Rebuild the best model with its best parameters
-            best_trial_params = study.best_trial.params
+            best_trial_params = best_studies[best_model_name].best_trial.params
             if best_model_name == 'Lasso':
                 best_model = Lasso(**best_trial_params)
             elif best_model_name == 'Ridge':
@@ -83,9 +85,11 @@ class ModelTrainer:
             elif best_model_name == 'DecisionTree':
                 best_model = DecisionTreeRegressor(**best_trial_params)
             elif best_model_name == 'XGBoost':
-                best_model = XGBRegressor(**best_trial_params)
+                best_model = XGBRegressor(**best_trial_params, objective='reg:squarederror')
             else:
                 best_model = LinearRegression()
+
+            best_model.fit(X_train, y_train)
 
             logging.info(f'Best Model Found, Model name: {best_model_name}, R2 score: {best_model_score}')
             print(f'Best Model Found, Model name: {best_model_name}, R2 score: {best_model_score}')
